@@ -170,6 +170,51 @@ export async function saveDetails(formData: FormData): Promise<void> {
   redirect("/profile");
 }
 
+const timeRe = /^([01]\d|2[0-3]):[0-5]\d$/;
+const trainingSchema = z
+  .object({
+    weekdays: z.array(z.coerce.number().int().min(1).max(7)).min(1).max(7),
+    startTime: z.string().regex(timeRe),
+    endTime: z.string().regex(timeRe),
+  })
+  .refine((v) => v.endTime > v.startTime);
+
+/** Creates one weekly training slot per ticked weekday for the same time range. */
+export async function addTrainingSlots(formData: FormData): Promise<void> {
+  const parsed = trainingSchema.safeParse({
+    weekdays: formData.getAll("weekday"),
+    startTime: formData.get("startTime"),
+    endTime: formData.get("endTime"),
+  });
+  if (!parsed.success) redirect("/settings?error=training");
+  const athlete = await getCurrentAthlete();
+  if (!athlete) redirect("/settings?error=training");
+
+  const supabase = await createClient();
+  const rows = [...new Set(parsed.data.weekdays)].map((weekday) => ({
+    athlete_id: athlete.id,
+    weekday,
+    start_time: parsed.data.startTime,
+    end_time: parsed.data.endTime,
+  }));
+  const { error } = await supabase
+    .from("athlete_training_slots")
+    .upsert(rows, { onConflict: "athlete_id,weekday,start_time" });
+  if (error) redirect("/settings?error=training");
+  revalidatePath("/", "layout");
+  redirect("/settings");
+}
+
+export async function deleteTrainingSlot(formData: FormData): Promise<void> {
+  const id = z.string().uuid().safeParse(formData.get("id"));
+  const athlete = await getCurrentAthlete();
+  if (!id.success || !athlete) redirect("/settings");
+  const supabase = await createClient();
+  await supabase.from("athlete_training_slots").delete().eq("id", id.data).eq("athlete_id", athlete.id);
+  revalidatePath("/", "layout");
+  redirect("/settings");
+}
+
 export async function unlinkBeAthleticsProfile(): Promise<void> {
   const athlete = await getCurrentAthlete();
   if (!athlete) redirect("/settings");

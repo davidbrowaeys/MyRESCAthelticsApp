@@ -1,6 +1,7 @@
 // _______________This Code was generated using GenAI tool : Codify, Please check for accuracy_______________
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
@@ -22,6 +23,20 @@ export async function signIn(formData: FormData): Promise<void> {
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) redirect("/login?error=1");
   redirect("/");
+}
+
+/** Starts the Google OAuth flow; Supabase returns to /auth/callback with a code. */
+export async function signInWithGoogle(): Promise<void> {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? (host?.startsWith("localhost") ? "http" : "https");
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${proto}://${host}/auth/callback` },
+  });
+  if (error || !data.url) redirect("/login?error=1");
+  redirect(data.url);
 }
 
 export async function signOut(): Promise<void> {

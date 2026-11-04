@@ -24,7 +24,9 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
   const isAuthenticated = Boolean(data?.claims);
   const isLogin = request.nextUrl.pathname.startsWith("/login");
 
-  if (!isAuthenticated && !isLogin) {
+  const isAuthCallback = request.nextUrl.pathname.startsWith("/auth/callback");
+
+  if (!isAuthenticated && !isLogin && !isAuthCallback) {
     const redirect = request.nextUrl.clone();
     redirect.pathname = "/login";
     redirect.search = "";

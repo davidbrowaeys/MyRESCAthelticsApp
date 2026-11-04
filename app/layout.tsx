@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "My RESC Athletics",
   description: "RESC athletics companion",
   robots: { index: false, follow: false },
+  icons: { icon: "/icons/resc-logo.png", apple: "/icons/resc-logo.png" },
   appleWebApp: { capable: true, title: "My RESC Athletics", statusBarStyle: "default" },
 };
 

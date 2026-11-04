@@ -7,9 +7,16 @@ import { getCurrentAthlete } from "@/lib/athletes";
 import { getProvider } from "@/lib/beathletics/factory";
 import type { ExternalAthlete } from "@/lib/domain/types";
 import { getDict } from "@/lib/i18n";
+import { listTrainingSlots } from "@/lib/training/slots";
 import { getLastSyncRun } from "@/lib/results/runs";
 import { signOut } from "../../login/actions";
-import { linkBeAthleticsProfile, resyncResults, unlinkBeAthleticsProfile } from "../profile/actions";
+import {
+  addTrainingSlots,
+  deleteTrainingSlot,
+  linkBeAthleticsProfile,
+  resyncResults,
+  unlinkBeAthleticsProfile,
+} from "../profile/actions";
 
 type Params = { error?: string; q?: string; synced?: string };
 
@@ -28,6 +35,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     }
   }
   const lastRun = athlete?.beathleticsLiveId ? await getLastSyncRun(athlete.id) : null;
+  const slots = athlete ? await listTrainingSlots(athlete.id) : [];
+  const dayFmt = new Intl.DateTimeFormat(t.locale, { weekday: "short", timeZone: "UTC" });
+  const dayName = (wd: number) => dayFmt.format(new Date(Date.UTC(2024, 0, wd)));
   const field = "mt-1 min-h-12 w-full rounded-2xl border border-border bg-card px-4 text-base text-foreground";
 
   return (
@@ -106,6 +116,61 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           </Link>
         </>
       )}
+
+      {athlete ? (
+        <section className="mt-6 rounded-3xl border border-border bg-card p-6" aria-label={t.training.title}>
+          <h2 className="text-xl font-semibold">{t.training.title}</h2>
+          <p className="mt-2 text-muted">{t.training.intro}</p>
+          {error === "training" ? (
+            <p role="alert" className="mt-2 rounded-2xl bg-accent p-3 text-sm">{t.training.error}</p>
+          ) : null}
+          {slots.length === 0 ? (
+            <p className="mt-3 text-sm text-muted">{t.training.empty}</p>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {slots.map((s) => (
+                <li key={s.id} className="flex items-center justify-between rounded-2xl border border-border p-3">
+                  <span className="font-semibold capitalize">
+                    {dayName(s.weekday)} · {s.startTime}-{s.endTime}
+                  </span>
+                  <form action={deleteTrainingSlot}>
+                    <input type="hidden" name="id" value={s.id} />
+                    <button type="submit" className="min-h-12 px-3 text-sm text-muted underline">
+                      {t.training.remove}
+                    </button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          )}
+          <form action={addTrainingSlots} className="mt-4 space-y-3">
+            <fieldset>
+              <legend className="text-sm font-medium">{t.training.days}</legend>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {[1, 2, 3, 4, 5, 6, 7].map((wd) => (
+                  <label key={wd} className="flex min-h-12 cursor-pointer items-center gap-2 rounded-2xl border border-border px-3 text-sm capitalize">
+                    <input type="checkbox" name="weekday" value={wd} />
+                    {dayName(wd)}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block text-sm font-medium">
+                {t.training.start}
+                <input type="time" name="startTime" required defaultValue="18:00" className={field} />
+              </label>
+              <label className="block text-sm font-medium">
+                {t.training.end}
+                <input type="time" name="endTime" required defaultValue="20:00" className={field} />
+              </label>
+            </div>
+            <button type="submit" className="min-h-12 w-full rounded-2xl bg-primary px-4 font-semibold text-primary-foreground">
+              {t.training.add}
+            </button>
+          </form>
+        </section>
+      ) : null}
 
       <PaceToggle labels={t.pace} />
 

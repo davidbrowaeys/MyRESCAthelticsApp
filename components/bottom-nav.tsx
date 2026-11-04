@@ -1,6 +1,7 @@
 // _______________This Code was generated using GenAI tool : Codify, Please check for accuracy_______________
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Award, CalendarDays, Home, Settings, TrendingUp, User } from "lucide-react";
@@ -33,7 +34,10 @@ export function BottomNav({ labels }: { labels: NavLabels }) {
       aria-label={labels.label}
       className="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] md:inset-y-0 md:right-auto md:w-60 md:border-r md:border-t-0 md:pb-0"
     >
-      <p className="hidden px-6 pb-2 pt-8 text-lg font-bold md:block">{labels.appName}</p>
+      <div className="hidden items-center gap-3 px-6 pb-2 pt-8 md:flex">
+        <Image src="/icons/resc-logo.png" alt="" width={40} height={40} className="h-10 w-10 shrink-0 object-contain" />
+        <p className="text-lg font-bold">{labels.appName}</p>
+      </div>
       <ul className="flex md:flex-col md:gap-1 md:px-3">
         {items.map(({ href, label, Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
