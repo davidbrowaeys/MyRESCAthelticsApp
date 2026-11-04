@@ -30,7 +30,9 @@ export function pickMessage(list: readonly string[], previous?: string, random: 
 }
 
 /** Which message list belongs to a visual (idle and click-only reactions have none). */
+const SILENT_VISUALS = new Set<PaceVisual>(["idle", "hop", "wiggle", "run", "jump", "throw", "spin"]);
+
 export function messageKeyFor(visual: PaceVisual): MessageKey | undefined {
-  return visual === "idle" || visual === "hop" || visual === "wiggle" ? undefined : visual;
+  return SILENT_VISUALS.has(visual) ? undefined : (visual as MessageKey);
 }
 // __________________________GenAI: Generated code ends here______________________________
