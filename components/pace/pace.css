@@ -1,0 +1,174 @@
+/* Pace animations: transform / opacity only. Poses are keyed on [data-state]. */
+
+.pace { position: relative; display: block; width: 4.5rem; aspect-ratio: 200 / 224; }
+@media (min-width: 768px) { .pace { width: 7.5rem; } }
+@media (min-width: 1280px) { .pace { width: 8.75rem; } }
+.pace[data-size="sm"] { width: 4.5rem; }
+.pace svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+.pace-part { transform-box: view-box; }
+.pace-fig { transform-origin: 100px 216px; }
+.pace-breath { transform-origin: 100px 216px; animation: pace-breathe 4.2s ease-in-out infinite; }
+.pace-head-look {
+  transform-origin: 100px 112px;
+  transform: rotate(calc(var(--look-x, 0) * 0.8deg));
+  transition: transform 0.15s ease-out;
+}
+.pace-head { transform-origin: 100px 112px; animation: pace-head-wander 9s ease-in-out infinite; }
+.pace-pupil { transform: translate(calc(var(--look-x, 0) * 1px), calc(var(--look-y, 0) * 1px)); transition: transform 0.12s ease-out; }
+.pace-eye { transform-box: fill-box; transform-origin: center; animation: pace-blink 5.5s infinite; }
+.pace-armL { transform-origin: 66px 130px; }
+.pace-armR { transform-origin: 134px 130px; }
+.pace-legL { transform-origin: 84px 186px; }
+.pace-legR { transform-origin: 116px 186px; }
+.pace-mouth-open, .pace-sweat, .pace-zzz { opacity: 0; }
+.pace-zzz { animation: pace-zzz 2.6s ease-in-out infinite; }
+.pace-zzz-2 { animation-delay: 0.9s; }
+
+/* welcome: wave */
+.pace[data-state="welcome"] .pace-armR { transform: rotate(-150deg); animation: pace-wave 0.55s ease-in-out infinite; }
+.pace[data-state="welcome"] .pace-mouth-open,
+.pace[data-state="celebrate"] .pace-mouth-open,
+.pace[data-state="tired"] .pace-mouth-open { opacity: 1; }
+.pace[data-state="welcome"] .pace-mouth-smile,
+.pace[data-state="celebrate"] .pace-mouth-smile,
+.pace[data-state="tired"] .pace-mouth-smile { opacity: 0; }
+
+/* encourage: fist pump */
+.pace[data-state="encourage"] .pace-armR { transform: rotate(-150deg); animation: pace-pump 0.5s ease-in-out infinite; }
+.pace[data-state="encourage"] .pace-fig { animation: pace-bob 0.5s ease-in-out infinite; }
+
+/* running: jog */
+.pace[data-state="running"] .pace-fig { transform: rotate(4deg); animation: pace-run-bob 0.42s ease-in-out infinite; }
+.pace[data-state="running"] .pace-breath { animation: none; }
+.pace[data-state="running"] .pace-legL { transform: rotate(-16deg); animation: pace-swing 0.42s ease-in-out infinite reverse; }
+.pace[data-state="running"] .pace-legR { transform: rotate(16deg); animation: pace-swing 0.42s ease-in-out infinite; }
+.pace[data-state="running"] .pace-armL { transform: rotate(-20deg); animation: pace-swing 0.42s ease-in-out infinite; }
+.pace[data-state="running"] .pace-armR { transform: rotate(20deg); animation: pace-swing 0.42s ease-in-out infinite reverse; }
+
+/* celebrate: jump, both arms up */
+.pace[data-state="celebrate"] .pace-fig { animation: pace-jump 0.65s ease-in-out infinite; }
+.pace[data-state="celebrate"] .pace-armL { transform: rotate(155deg); animation: pace-cheer-l 0.33s ease-in-out infinite; }
+.pace[data-state="celebrate"] .pace-armR { transform: rotate(-155deg); animation: pace-cheer-r 0.33s ease-in-out infinite; }
+
+/* tired: lean forward, panting */
+.pace[data-state="tired"] .pace-fig { transform: rotate(7deg) translateY(2px); }
+.pace[data-state="tired"] .pace-breath { animation-duration: 1.8s; }
+.pace[data-state="tired"] .pace-head { transform: rotate(8deg) translateY(4px); animation: none; }
+.pace[data-state="tired"] .pace-armL { transform: rotate(8deg); }
+.pace[data-state="tired"] .pace-armR { transform: rotate(-8deg); }
+.pace[data-state="tired"] .pace-eye { transform: scaleY(0.6); animation: none; }
+.pace[data-state="tired"] .pace-sweat { opacity: 1; animation: pace-sweat 1.6s ease-in infinite; }
+
+/* sleeping */
+.pace[data-state="sleeping"] .pace-breath { animation-duration: 6s; }
+.pace[data-state="sleeping"] .pace-head { transform: rotate(9deg) translateY(3px); animation: none; }
+.pace[data-state="sleeping"] .pace-eye { transform: scaleY(0.08); animation: none; }
+.pace[data-state="sleeping"] .pace-pupil { transform: none; }
+
+/* click-only reactions */
+.pace[data-state="hop"] .pace-fig { animation: pace-jump 0.7s ease-out 1; }
+.pace[data-state="wiggle"] .pace-fig { animation: pace-wiggle 0.35s ease-in-out 2; }
+
+/* contextual / random movements */
+.pace[data-state="run"] { animation: pace-dash 1.5s ease-in-out 1; }
+.pace[data-state="run"] .pace-fig { transform: rotate(-4deg); animation: pace-run-bob 0.2s ease-in-out infinite; }
+.pace[data-state="run"] .pace-breath { animation: none; }
+.pace[data-state="run"] .pace-legL { transform: rotate(-16deg); animation: pace-swing 0.2s ease-in-out infinite reverse; }
+.pace[data-state="run"] .pace-legR { transform: rotate(16deg); animation: pace-swing 0.2s ease-in-out infinite; }
+.pace[data-state="run"] .pace-armL { animation: pace-swing 0.2s ease-in-out infinite; }
+.pace[data-state="run"] .pace-armR { animation: pace-swing 0.2s ease-in-out infinite reverse; }
+.pace[data-state="jump"] .pace-fig { animation: pace-big-jump 0.95s ease-out 1; }
+.pace[data-state="jump"] .pace-armL { transform: rotate(150deg); }
+.pace[data-state="jump"] .pace-armR { transform: rotate(-150deg); }
+.pace[data-state="jump"] .pace-legL { animation: pace-tuck-l 0.95s ease-out 1; }
+.pace[data-state="jump"] .pace-legR { animation: pace-tuck-r 0.95s ease-out 1; }
+.pace[data-state="jump"] .pace-mouth-open, .pace[data-state="throw"] .pace-mouth-open { opacity: 1; }
+.pace[data-state="jump"] .pace-mouth-smile, .pace[data-state="throw"] .pace-mouth-smile { opacity: 0; }
+.pace[data-state="throw"] .pace-armR { animation: pace-throw-arm 1.2s ease-in-out 1; }
+.pace[data-state="throw"] .pace-fig { animation: pace-throw-body 1.2s ease-in-out 1; }
+.pace[data-state="spin"] .pace-fig { animation: pace-spin 0.8s ease-in-out 1; }
+.pace-ball {
+  position: absolute; left: 78%; top: 62%; width: 14%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #ffd23f 55%, #e0a800); border: 2px solid #0b1b3a;
+  pointer-events: none; opacity: 0; animation: pace-ball 1.2s ease-in 1 both;
+}
+
+@keyframes pace-dash {
+  0% { transform: translateX(0) scaleX(1); } 40% { transform: translateX(-70px) scaleX(1); }
+  50% { transform: translateX(-70px) scaleX(-1); } 100% { transform: translateX(0) scaleX(-1); }
+}
+@keyframes pace-big-jump {
+  0% { transform: translateY(0) scale(1.05, 0.9); } 15% { transform: translateY(0) scale(1.05, 0.9); }
+  50% { transform: translateY(-48px) scale(0.96, 1.06); } 85%, 100% { transform: translateY(0) scale(1.04, 0.94); }
+}
+@keyframes pace-tuck-l { 0%, 100% { transform: none; } 50% { transform: rotate(35deg); } }
+@keyframes pace-tuck-r { 0%, 100% { transform: none; } 50% { transform: rotate(-35deg); } }
+@keyframes pace-throw-arm {
+  0% { transform: rotate(0); } 35% { transform: rotate(-165deg); } 55% { transform: rotate(-30deg); } 100% { transform: rotate(0); }
+}
+@keyframes pace-throw-body { 0%, 100% { transform: rotate(0); } 35% { transform: rotate(-5deg); } 55% { transform: rotate(6deg); } }
+@keyframes pace-ball {
+  0%, 50% { transform: translate(0, 0); opacity: 0; } 55% { opacity: 1; }
+  100% { transform: translate(-150px, -40px) rotate(-360deg); opacity: 0; }
+}
+@keyframes pace-spin { 0% { transform: rotate(0) translateY(0); } 50% { transform: rotate(180deg) translateY(-26px); } 100% { transform: rotate(360deg) translateY(0); } }
+
+@keyframes pace-breathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 1.022); } }
+@keyframes pace-head-wander { 0%, 55%, 100% { transform: rotate(0); } 65% { transform: rotate(-3deg); } 80% { transform: rotate(2.5deg); } }
+@keyframes pace-blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.08); } }
+@keyframes pace-wave { 0%, 100% { transform: rotate(-135deg); } 50% { transform: rotate(-168deg); } }
+@keyframes pace-pump { 0%, 100% { transform: rotate(-115deg); } 50% { transform: rotate(-165deg); } }
+@keyframes pace-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes pace-swing { 0%, 100% { transform: rotate(34deg); } 50% { transform: rotate(-34deg); } }
+@keyframes pace-run-bob { 0%, 100% { transform: translateY(0) rotate(4deg); } 50% { transform: translateY(-5px) rotate(4deg); } }
+@keyframes pace-jump {
+  0%, 100% { transform: translateY(0) scale(1.03, 0.95); }
+  45% { transform: translateY(-20px) scale(0.97, 1.04); }
+}
+@keyframes pace-cheer-l { 0%, 100% { transform: rotate(150deg); } 50% { transform: rotate(168deg); } }
+@keyframes pace-cheer-r { 0%, 100% { transform: rotate(-150deg); } 50% { transform: rotate(-168deg); } }
+@keyframes pace-wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+@keyframes pace-sweat { 0% { transform: translateY(-4px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(14px); opacity: 0; } }
+@keyframes pace-zzz { 0% { transform: translateY(6px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-10px); opacity: 0; } }
+
+/* confetti (subtle, short-lived) */
+.pace-confetti { position: absolute; inset: 0; pointer-events: none; }
+.pace-confetti span {
+  position: absolute; top: 0; left: 50%; width: 6px; height: 10px; border-radius: 1px; opacity: 0;
+  animation: pace-confetti 1.4s ease-out var(--cd, 0ms) 2 both;
+}
+@keyframes pace-confetti {
+  0% { transform: translate(0, 0) rotate(var(--cr, 0)); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(var(--cx, 0), 80px) rotate(calc(var(--cr, 0deg) + 300deg)); opacity: 0; }
+}
+
+/* tab hidden: stop all motion */
+[data-pace-paused="true"] .pace *,
+[data-pace-paused="true"] .pace-confetti span { animation-play-state: paused !important; }
+
+/* speech bubble */
+.pace-bubble {
+  position: relative; visibility: hidden; opacity: 0; transform: translateY(6px) scale(0.94); transform-origin: 100% 100%;
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2), visibility 0s linear 0.25s;
+}
+.pace-bubble[data-open="true"] { visibility: visible; opacity: 1; transform: none; transition-delay: 0s; }
+.pace-bubble::after {
+  content: ""; position: absolute; right: -6px; bottom: 14px; width: 12px; height: 12px; background: var(--card);
+  border-top: 1px solid var(--border); border-right: 1px solid var(--border); transform: rotate(45deg);
+}
+@media (max-height: 480px) { .pace-bubble { display: none; } }
+
+/* reduced motion: static poses stay, nothing loops or flies */
+@media (prefers-reduced-motion: reduce) {
+  .pace *, .pace-bubble { animation: none !important; transition: none !important; }
+  .pace-confetti { display: none; }
+  .pace-zzz { opacity: 1; }
+  .pace[data-state="tired"] .pace-sweat { opacity: 1; }
+}
+ 
+/* hurdle game: the engine owns all movement, so the pose must not translate the figure */ 
+.pace-game .pace[data-state="jump"] .pace-fig { animation: none; } 
+.pace-game .pace[data-state="running"] .pace-fig { animation-duration: 0.26s; } 
+.pace-game .pace[data-state="running"] :is(.pace-legL, .pace-legR, .pace-armL, .pace-armR) { animation-duration: 0.26s; }

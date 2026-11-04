@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* RESC-oriented blue/white tokens. Not the official crest palette: refine when brand assets are supplied. */
+:root {
+  --background: #f4f7fd;
+  --foreground: #0b1b3a;
+  --card: #ffffff;
+  --muted: #55658a;
+  --border: #d9e2f4;
+  --primary: #0a3d91;
+  --primary-foreground: #ffffff;
+  --accent: #e3ecff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #07122b;
+    --foreground: #eaf0ff;
+    --card: #0e1f45;
+    --muted: #9db0d8;
+    --border: #1d3366;
+    --primary: #5b95ff;
+    --primary-foreground: #04122e;
+    --accent: #14295a;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

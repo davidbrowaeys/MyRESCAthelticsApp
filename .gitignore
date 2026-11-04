@@ -1,0 +1,25 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+*.har
+.next/
+coverage/
+next-env.d.ts
+*.tsbuildinfo
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Tooling
+.codify/
+.agents/
+supabase/.temp/
+supabase/.branches/
