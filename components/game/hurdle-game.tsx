@@ -35,6 +35,10 @@ const GROUND = 200;
 const PPU = 20; // pixels per metre
 const PACE_W = 72;
 const PACE_H = 80;
+// Narrow screens show at least this many logical px of track (26 m) so the stage is zoomed in, not shrunk.
+const MIN_VIEW_W = 520;
+// Matches the main layout's bottom padding (pb-28) reserved for the mobile tab bar.
+const BOTTOM_RESERVE = 112;
 const BEST_KEY = "pace-hurdle-best";
 const RESTART_LOCK_MS = 600;
 const FIXED_DT = 1 / 120;
@@ -91,7 +95,7 @@ export function HurdleGame({ labels }: { labels: HurdleGameLabels }) {
   const [best, setBest] = useState(0);
   const [pace, setPace] = useState<PaceVisual>("running");
   const [unlocked, setUnlocked] = useState(false);
-  const [scale, setScale] = useState(1);
+  const [view, setView] = useState({ scale: 1, height: H });
   const [reducedMotion, setReducedMotion] = useState(false);
   const [, startTransition] = useTransition();
 
@@ -122,15 +126,30 @@ export function HurdleGame({ labels }: { labels: HurdleGameLabels }) {
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
-  // Fit the fixed 800x240 stage to the available width.
+  // Zoom the 800x240 track to the width (cropping the far right on narrow screens) and, in portrait,
+  // grow the sky above it so the stage fills the remaining screen height.
   useEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
-    const update = () => setScale(el.clientWidth / W);
+    const update = () => {
+      const width = el.clientWidth;
+      const nextScale = width / Math.min(W, Math.max(MIN_VIEW_W, width));
+      let height = H;
+      if (window.innerHeight > window.innerWidth) {
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        const available = window.innerHeight - top - BOTTOM_RESERVE;
+        height = Math.max(H, available / nextScale);
+      }
+      setView((prev) => (prev.scale === nextScale && prev.height === height ? prev : { scale: nextScale, height }));
+    };
     update();
     const observer = new ResizeObserver(update);
     observer.observe(el);
-    return () => observer.disconnect();
+    window.addEventListener("resize", update);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", update);
+    };
   }, []);
 
   useEffect(() => {
@@ -246,7 +265,7 @@ export function HurdleGame({ labels }: { labels: HurdleGameLabels }) {
         role="img"
         aria-label={labels.stageLabel}
         className="relative w-full select-none overflow-hidden rounded-3xl border border-border"
-        style={{ height: H * scale, touchAction: "manipulation" }}
+        style={{ height: view.height * view.scale, touchAction: "manipulation" }}
       >
         <div
           onPointerDown={press}
@@ -254,11 +273,13 @@ export function HurdleGame({ labels }: { labels: HurdleGameLabels }) {
           onPointerCancel={release}
           onPointerLeave={release}
           className="absolute left-0 top-0 bg-gradient-to-b from-sky-300 to-sky-100"
-          style={{ width: W, height: H, transform: `scale(${scale})`, transformOrigin: "top left" }}
+          style={{ width: W, height: view.height, transform: `scale(${view.scale})`, transformOrigin: "top left" }}
         >
-          <canvas ref={canvasRef} style={{ width: W, height: H }} />
-          <div ref={paceBoxRef} className="pace-game absolute left-0 top-0" style={{ width: PACE_W, height: PACE_H, willChange: "transform" }}>
-            <PaceCharacter state={pace} size="sm" reducedMotion={reducedMotion} />
+          <div className="absolute bottom-0 left-0" style={{ width: W, height: H }}>
+            <canvas ref={canvasRef} style={{ width: W, height: H }} />
+            <div ref={paceBoxRef} className="pace-game absolute left-0 top-0" style={{ width: PACE_W, height: PACE_H, willChange: "transform" }}>
+              <PaceCharacter state={pace} size="sm" reducedMotion={reducedMotion} />
+            </div>
           </div>
         </div>
 
